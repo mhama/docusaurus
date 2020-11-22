@@ -68,6 +68,22 @@ function parseJSXFile(file) {
 
 function writeFileAndCreateFolder(file, content) {
   mkdirp.sync(file.replace(new RegExp('/[^/]*$'), ''));
+  writeFileIfChanged(file, content);
+}
+
+// write file only if the contents have changed.
+// it is needed not to trigger live-reload too frequently.
+function writeFileIfChanged(file, content) {
+  if (!fs.existsSync(file)) {
+    // save the file as it is new.
+    fs.writeFileSync(file, content);
+    return;
+  }
+  var current = fs.readFileSync(file, 'utf-8');
+  if (content === current) {
+    // no change. let's skip saving.
+    return;
+  }
   fs.writeFileSync(file, content);
 }
 
